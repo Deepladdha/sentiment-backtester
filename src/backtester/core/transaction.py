@@ -15,6 +15,7 @@ class Transaction:
     timestamp : datetime
     action : Action
 
-def __post_init__(self):
-    if not isinstance(self.action, Action):
-        raise TypeError(f"action must be an Action enum member, got {type(self.action)}")
+    def __post_init__(self):
+        if not isinstance(self.action, Action):
+            raise TypeError(f"action must be an Action enum member, got {type(self.action)}")
+   
