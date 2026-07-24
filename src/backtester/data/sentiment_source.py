@@ -5,15 +5,22 @@ from datetime import datetime
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from backtester.data.base import DataSource
 from dotenv import load_dotenv
+from backtester.data.cache import Cache
 
 load_dotenv()
 
 class SentimentDataSource(DataSource):
+
     def __init__(self):
         self.api_key= os.getenv("NEWS_API_KEY")
         self.analyzer = SentimentIntensityAnalyzer()
+        self.cache = Cache(cache_dir=".cache/sentiment")
 
     def fetch(self, ticker: str, start: datetime, end: datetime)-> pd.DataFrame:
+
+        cached_data = self.cache.get(ticker, start, end)
+        if cached_data is not None:
+            return cached_data
         response = requests.get("https://newsapi.org/v2/everything",
                             params = {
                                 "q" : ticker,
@@ -36,6 +43,8 @@ class SentimentDataSource(DataSource):
                 "sentiment": score
                 }
             )
+        df = pd.DataFrame(records)
+        self.cache.save(ticker, start, end, df)
 
-        return pd.DataFrame(records)
+        return df
 
