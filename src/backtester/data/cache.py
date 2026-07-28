@@ -17,12 +17,14 @@ class Cache:
     def save(self,ticker: str, start: datetime, end : datetime, df : pd.DataFrame) -> None:
         key = self._build_key(ticker,start,end)
         path = self._file_path(key)
-        df.to_json(path, orient="records", date_format= "iso")
+        records = json.loads(df.to_json(orient="records", date_format= "iso"))
+        with open(path, "w") as f:
+            json.dump(records, f, indent=2)
 
-    def get(self, ticker: str, start: datetime, end : datetime):
+    def get(self, ticker: str, start: datetime, end : datetime)-> pd.DataFrame:
         key = self._build_key(ticker,start,end)
         path = self._file_path(key)
         if not os.path.exists(path):
-            return None
-        return pd.read_json(path)
+            return None 
+        return pd.read_json(path) 
         
