@@ -11,10 +11,10 @@ load_dotenv()
 
 class SentimentDataSource(DataSource):
 
-    def __init__(self):
+    def __init__(self, cache : Cache = None):
         self.api_key= os.getenv("NEWS_API_KEY")
         self.analyzer = SentimentIntensityAnalyzer()
-        self.cache = Cache(cache_dir=".cache/sentiment")
+        self.cache = cache if cache is not None else Cache(cache_dir=".cache/sentiment")
 
     def fetch(self, ticker: str, start: datetime, end: datetime)-> pd.DataFrame:
 
